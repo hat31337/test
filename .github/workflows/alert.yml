@@ -14,19 +14,6 @@ jobs:
   send-notification:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate link
-        run: |
-          if [[ ${{ github.event_name }} == 'issues' ]]; then
-            link="https://github.com/${{ github.repository }}/issues/${{ github.event.issue.number }}"
-          elif [[ ${{ github.event_name }} == 'pull_request' ]]; then
-            link="https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}"
-          elif [[ ${{ github.event_name }} == 'watch' ]]; then
-            link="https://github.com/${{ github.repository }}/watchers"
-          elif [[ ${{ github.event_name }} == 'fork' ]]; then
-            link="https://github.com/${{ github.repository }}/fork"
-          elif [[ ${{ github.event_name }} == 'repository_dispatch' ]]; then
-            link="https://github.com/${{ github.repository }}/stargazers"
-          fi
       - name: Send Slack notification
         uses: slackapi/slack-github-action@v1.23.0
         with: 
@@ -47,17 +34,6 @@ jobs:
                   "text": {
                     "type": "mrkdwn",
                     "text": "Created by *${{ github.event.sender.login }}*"
-                  },
-                  "accessory": {
-                    "type": "button",
-                    "text": {
-                      "type": "plain_text",
-                      "text": ":link: View",
-                      "emoji": true
-                    },
-                    "value": "view",
-                    "url": "<${{ link }}>",
-                    "action_id": "button-action"
                   }
                 }
               ]
