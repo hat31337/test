@@ -1,5 +1,4 @@
 name: Send Slack notification on activity
-uses: slackapi/slack-send@v1.23.0
 on:
   issues:
     types: [opened]
@@ -11,6 +10,12 @@ on:
     types: [created]
   repository_dispatch:
     types: [starred]
+jobs:
+  send-notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v1.23.0
 env:
     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
