@@ -15,8 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send Slack notification
-      - uses: slackapi/slack-github-action@v1.23.0
-      - with: 
+        uses: slackapi/slack-github-action@v1.23.0
+        with: 
           payload: "*New activity on GitHub*\n:warning: Event: `${{ github.event_name }}`\n:file_folder: Repository: `${{ github.repository }}`\n:loudspeaker: Title: `${{ github.event.issue.title || github.event.pull_request.title }}`\n:link: URL: `${{ github.event.issue.html_url || github.event.pull_request.html_url }}`"
 env:
     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
