@@ -14,10 +14,54 @@ jobs:
   send-notification:
     runs-on: ubuntu-latest
     steps:
+      - name: Generate link
+        run: |
+          if [[ ${{ github.event_name }} == 'issues' ]]; then
+            link="https://github.com/${{ github.repository }}/issues/${{ github.event.issue.number }}"
+          elif [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            link="https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}"
+          elif [[ ${{ github.event_name }} == 'watch' ]]; then
+            link="https://github.com/${{ github.repository }}/watchers"
+          elif [[ ${{ github.event_name }} == 'fork' ]]; then
+            link="https://github.com/${{ github.repository }}/fork"
+          elif [[ ${{ github.event_name }} == 'repository_dispatch' ]]; then
+            link="https://github.com/${{ github.repository }}/stargazers"
+          fi
       - name: Send Slack notification
         uses: slackapi/slack-github-action@v1.23.0
         with: 
-          payload: "*New activity on GitHub*\n:warning: Event: `${{ github.event_name }}`\n:file_folder: Repository: `${{ github.repository }}`\n:loudspeaker: Title: `${{ github.event.issue.title || github.event.pull_request.title }}`\n:link: URL: `${{ github.event.issue.html_url || github.event.pull_request.html_url }}`"
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":red_circle: New ${{ github.event_name }}",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Created by *${{ github.event.sender.login }}*"
+                  },
+                  "accessory": {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": ":link: View",
+                      "emoji": true
+                    },
+                    "value": "view",
+                    "url": "<${{ link }}>",
+                    "action_id": "button-action"
+                  }
+                }
+              ]
+            }
 env:
     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
